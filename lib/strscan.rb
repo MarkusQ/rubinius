@@ -249,15 +249,10 @@ class StringScanner
 
     return nil if eos?
 
-    if headonly
-      # NOTE - match_start is an Oniguruma feature that Rubinius exposes.
-      # We use it here to avoid creating a new Regexp with '^' prepended.
-      @match = pattern.match_start @string, @pos
-    else
-      # NOTE - search_region is an Oniguruma feature that Rubinius exposes.
-      # We use it so we can begin the search in the middle of the string
-      @match = pattern.search_region @string, @pos, @string.size, true
-    end
+    # NOTE - match_start & search_region are Oniguruma features that Rubinius exposes.
+    # We use match_start here to avoid creating a new Regexp with '^' prepended.
+    # We use search_region so we can begin the search in the middle of the string
+    @match = pattern.match_start(@string, @pos) || (!headonly && pattern.search_region(@string, @pos, @string.size, true))
 
     return nil unless @match
 
